@@ -1,31 +1,32 @@
-#  sshq — SSH Simplified for Devs
+# sshq — SSH Simplified for Devs
 
-A macOS command-line utility to **manage SSH connections**, store credentials/configs, and **connect to remote VMs instantly** — all from a single CLI. Inspired by developer painpoints, built to boost productivity.
+**sshq** is a macOS-native command-line utility to manage SSH connections. It lets developers save, connect, list, and delete remote VM SSH configs from a single CLI, improving daily productivity for DevOps and backend engineers.
 
 ---
 
 ## ✨ Features
 
-- 🔐 **Add** and save remote SSH host details
-- ⚡ **One-click SSH** to remote machines
-- 🔑 Automatically install your SSH key using `ssh-copy-id`
-- 🗑️ Easily **delete** outdated hosts
-- 📋 **List** all saved hosts
-- 💾 Stores configs in a local JSON file at `~/.sshq_hosts.json`
+- 🔐 Add and save SSH host credentials
+- ⚡ One-click SSH to remote machines via alias
+- 🔑 Automatically installs your SSH public key using `ssh-copy-id`
+- 📋 List all saved SSH connections
+- 🗑️ Delete unused or outdated hosts
+- 💾 Stores config data in `~/.sshq_hosts.json`
+- 🧩 Written in Go — fast, lightweight, cross-platform friendly
 
 ---
 
-## 💻 Requirements
+## 💻 Prerequisites
 
-- **macOS** (tested on M1/M3)
-- Go 1.18+ (Install from [golang.org](https://golang.org/dl/))
-- `ssh` and `ssh-copy-id` available on your system (`brew install openssh` if needed)
+Before using **sshq**, ensure your system has the following:
 
----
+| Tool          | How to Install                                |
+|---------------|------------------------------------------------|
+| Go (>=1.18)   | [golang.org](https://golang.org/dl/) or `brew install go` |
+| OpenSSH       | Pre-installed on macOS. If missing: `brew install openssh` |
 
-## 📦 Installation
+To verify installation:
 
 ```bash
-git clone https://github.com/yourusername/sshq.git
-cd sshq
-go build -o sshq
+go version
+ssh -V
