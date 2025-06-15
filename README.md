@@ -1,4 +1,4 @@
-#sshq — SSH Simplified for Devs
+#  sshq — SSH Simplified for Devs
 
 A macOS command-line utility to **manage SSH connections**, store credentials/configs, and **connect to remote VMs instantly** — all from a single CLI. Inspired by developer painpoints, built to boost productivity.
 
