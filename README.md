@@ -48,6 +48,18 @@ go build -o sshq
 sudo mv sshq /usr/local/bin/
 ```
 
+## Prerequisites
+
+1. Start the ssh-agent in the background
+```bash
+eval "$(ssh-agent -s)"
+```
+
+2. Add your private key (e.g., ~/.ssh/id_rsa)
+```bash
+ssh-add ~/.ssh/id_rsa
+```
+
 ## Usage
 
 1. Add a host
