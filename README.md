@@ -34,16 +34,16 @@ ssh -V
 
 ## Installation
 
--  Clone the repository
+1. Clone the repository
 ```bash
 git clone https://github.com/yourusername/sshq.git
 cd sshq
 ```
-- Build the app (This creates a binary for our executions)
+2. Build the app (This creates a binary for our executions)
 ```bash
 go build -o sshq
 ```
-- Make it globally accessible
+3. Make it globally accessible
 ```bash
 sudo mv sshq /usr/local/bin/
 ```
