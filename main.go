@@ -72,6 +72,14 @@ func handleAdd() {
 			fmt.Printf("   ssh-copy-id -p %d %s@%s\n", port, host.User, host.Address)
 		} else {
 			fmt.Println("✅ SSH key copied successfully.")
+			// 🔐 Automatically try to add the key to ssh-agent
+			home, _ := os.UserHomeDir()
+			keyPath := fmt.Sprintf("%s/.ssh/id_rsa", home)
+			addCmd := exec.Command("ssh-add", keyPath)
+			addCmd.Stdin = os.Stdin
+			addCmd.Stdout = os.Stdout
+			addCmd.Stderr = os.Stderr
+			_ = addCmd.Run()
 		}
 	}
 }
