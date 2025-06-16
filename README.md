@@ -4,7 +4,7 @@
 
 ---
 
-## ✨ Features
+## Features
 
 - 🔐 Add and save SSH host credentials
 - ⚡ One-click SSH to remote machines via alias
@@ -16,7 +16,7 @@
 
 ---
 
-## 💻 Prerequisites
+## Prerequisites
 
 Before using **sshq**, ensure your system has the following:
 
@@ -30,3 +30,39 @@ To verify installation:
 ```bash
 go version
 ssh -V
+```
+
+## Installation
+
+-  Clone the repository
+```bash
+git clone https://github.com/yourusername/sshq.git
+cd sshq
+```
+- Build the app (This creates a binary for our executions)
+```bash
+go build -o sshq
+```
+- Make it globally accessible
+```bash
+sudo mv sshq /usr/local/bin/
+```
+
+## Usage
+
+- Add a host
+```bash
+sshq add <alias> <username@host> -p <port>
+```
+- Connect to a host
+```bash
+sshq connect <alias>
+```
+- List all hosts
+```bash
+sshq list
+```
+- Delete a host
+```bash
+sshq delete <alias>
+```
