@@ -50,19 +50,19 @@ sudo mv sshq /usr/local/bin/
 
 ## Usage
 
-- Add a host
+1. Add a host
 ```bash
 sshq add <alias> <username@host> -p <port>
 ```
-- Connect to a host
+2. Connect to a host
 ```bash
 sshq connect <alias>
 ```
-- List all hosts
+3. List all hosts
 ```bash
 sshq list
 ```
-- Delete a host
+4. Delete a host
 ```bash
 sshq delete <alias>
 ```
