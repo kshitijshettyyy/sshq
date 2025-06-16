@@ -66,3 +66,23 @@ sshq list
 ```bash
 sshq delete <alias>
 ```
+
+
+---
+
+## Coming Soon
+
+- 🔐 **Encrypted password fallback** (optional)
+- ⌨️ **Autocomplete shell integration**
+- 🍺 **Homebrew install** (`brew install sshq`)
+- 🖥️ **GUI Notch App** with:
+  - SSH management
+  - Clipboard history
+  - Mac system stats
+
+---
+
+## Author
+
+Made with ❤️ by [**Kshitij Shetty**](https://github.com/kshitijshettyyy)  
+
