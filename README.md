@@ -34,6 +34,16 @@ ssh -V
 
 ## Installation
 
+### Using Homebrew
+
+1. Using brew tap into my repo and then brew install the sshq utility
+```bash
+brew tap kshitijshettyyy/sshq
+brew install sshq
+```
+
+### Using git clone
+
 1. Clone the repository
 ```bash
 git clone https://github.com/yourusername/sshq.git
