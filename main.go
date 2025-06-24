@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
@@ -17,42 +18,87 @@ func main() {
 		return
 	}
 
-	switch os.Args[1] {
+	command := os.Args[1]
+
+	switch command {
 	case "add":
-		handleAdd()
+		addHost()
 	case "connect":
-		handleConnect()
-	case "delete":
-		handleDelete()
+		if len(os.Args) != 3 {
+			fmt.Println("Usage: sshq connect <name>")
+			return
+		}
+		ssh.ConnectToHost(os.Args[2])
 	case "list":
-		handleList()
+		listHosts()
+	case "delete":
+		if len(os.Args) != 3 {
+			fmt.Println("Usage: sshq delete <name>")
+			return
+		}
+		config.DeleteHost(os.Args[2])
 	default:
-		fmt.Println("Unknown command:", os.Args[1])
 		printUsage()
 	}
 }
 
-func handleAdd() {
-	if len(os.Args) != 6 || os.Args[4] != "-p" {
-		fmt.Println("Invalid format. Use username@address")
-		return
-	}
-	name := os.Args[2]
-	userHost := os.Args[3]
-	port, err := strconv.Atoi(os.Args[5])
-	if err != nil {
-		fmt.Println("Invalid port.")
-		return
-	}
-	userHostParts := parseUserHost(userHost)
-	if userHostParts == nil {
-		fmt.Println("Invalid format. Use username@address")
-		return
+func printUsage() {
+	fmt.Println("Usage:")
+	fmt.Println("  sshq add [<alias> <user@host[:port]>]")
+	fmt.Println("  sshq connect <alias>")
+	fmt.Println("  sshq list")
+	fmt.Println("  sshq delete <alias>")
+}
+
+func addHost() {
+	var name, user, address string
+	port := 22 // default
+
+	if len(os.Args) == 4 {
+		name = os.Args[2]
+		userHost := os.Args[3]
+		parsedUser, parsedHost, parsedPort := parseUserHost(userHost)
+		if parsedUser != "" {
+			user = parsedUser
+		} else {
+			user = "root"
+		}
+		address = parsedHost
+		if parsedPort != 0 {
+			port = parsedPort
+		}
+	} else {
+		// Interactive mode
+		scanner := bufio.NewScanner(os.Stdin)
+		fmt.Print("Alias name: ")
+		scanner.Scan()
+		name = scanner.Text()
+
+		fmt.Print("Host (e.g., 192.168.0.5): ")
+		scanner.Scan()
+		address = scanner.Text()
+
+		fmt.Print("Username [root]: ")
+		scanner.Scan()
+		user = scanner.Text()
+		if user == "" {
+			user = "root"
+		}
+
+		fmt.Print("Port [22]: ")
+		scanner.Scan()
+		portInput := scanner.Text()
+		if portInput != "" {
+			parsed, err := strconv.Atoi(portInput)
+			if err == nil {
+				port = parsed
+			}
+		}
 	}
 
 	host := models.Host{
-		User:    userHostParts[0],
-		Address: userHostParts[1],
+		User:    user,
+		Address: address,
 		Port:    port,
 	}
 
@@ -72,7 +118,8 @@ func handleAdd() {
 			fmt.Printf("   ssh-copy-id -p %d %s@%s\n", port, host.User, host.Address)
 		} else {
 			fmt.Println("✅ SSH key copied successfully.")
-			// 🔐 Automatically try to add the key to ssh-agent
+
+			// Try to silently add key to ssh-agent
 			home, _ := os.UserHomeDir()
 			keyPath := fmt.Sprintf("%s/.ssh/id_rsa", home)
 			addCmd := exec.Command("ssh-add", keyPath)
@@ -84,51 +131,37 @@ func handleAdd() {
 	}
 }
 
-func handleConnect() {
-	if len(os.Args) != 3 {
-		fmt.Println("Usage: sshq connect <name>")
-		return
+func parseUserHost(input string) (user, host string, port int) {
+	port = 0
+	if strings.Contains(input, "@") {
+		parts := strings.SplitN(input, "@", 2)
+		user = parts[0]
+		input = parts[1]
+	} else {
+		user = "root"
 	}
-	ssh.ConnectToHost(os.Args[2])
+
+	if strings.Contains(input, ":") {
+		hostParts := strings.SplitN(input, ":", 2)
+		host = hostParts[0]
+		portParsed, err := strconv.Atoi(hostParts[1])
+		if err == nil {
+			port = portParsed
+		}
+	} else {
+		host = input
+	}
+	return
 }
 
-func handleDelete() {
-	if len(os.Args) != 3 {
-		fmt.Println("Usage: sshq delete <name>")
-		return
-	}
-	name := os.Args[2]
-	config.DeleteHost(name)
-}
-
-func handleList() {
+func listHosts() {
 	hosts := config.LoadHosts()
 	if len(hosts) == 0 {
 		fmt.Println("📭 No hosts found.")
 		return
 	}
-	fmt.Println("📋 Saved Hosts:")
-	for name, h := range hosts {
-		fmt.Printf("• %s: %s@%s -p %d\n", name, h.User, h.Address, h.Port)
+	fmt.Println("📋 Saved hosts:")
+	for name, host := range hosts {
+		fmt.Printf("- %s → %s@%s\n", name, host.User, host.Address)
 	}
-}
-
-func printUsage() {
-	fmt.Println("Usage:")
-	fmt.Println("  sshq add <name> <user@host> -p <port>")
-	fmt.Println("  sshq connect <name>")
-	fmt.Println("  sshq delete <name>")
-	fmt.Println("  sshq list")
-}
-
-func parseUserHost(userHost string) []string {
-	parts := make([]string, 2)
-	for i, v := range userHost {
-		if v == '@' {
-			parts[0] = userHost[:i]
-			parts[1] = userHost[i+1:]
-			return parts
-		}
-	}
-	return nil
 }
