@@ -72,9 +72,13 @@ ssh-add ~/.ssh/id_rsa
 
 ## Usage
 
-1. Add a host
+1. Add a host (Provide values as prompted)
 ```bash
-sshq add <alias> <username@host> -p <port>
+sshq add 
+Alias name:
+Host:
+Username:
+Port:
 ```
 2. Connect to a host
 ```bash
