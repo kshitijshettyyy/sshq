@@ -96,17 +96,17 @@ sshq delete <alias>
 
 ---
 
-## Coming Soon
+## Roadmap
 
-- 🔐 **Encrypted password fallback** (optional)
-- ⌨️ **Autocomplete shell integration**
-- 🍺 **Homebrew install** (`brew install sshq`)
-- 🖥️ **GUI Notch App** with:
-  - SSH management
-  - Clipboard history
-  - Mac system stats
+- [x] **Homebrew install** (`brew install sshq`) 🍺
+- [ ] **Encrypted password fallback** (optional) 🔐
+- [ ] **Autocomplete shell integration** ⌨️
+- [ ] **GUI Notch App: SSH Management** 🖥️
+- [ ] **GUI Notch App: Clipboard History** 📋
+- [ ] **GUI Notch App: Mac System Stats** 📊
 
 ---
+
 
 ## Author
 
