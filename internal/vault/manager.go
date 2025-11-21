@@ -65,3 +65,16 @@ func Load(alias string) (*Entry, error) {
 	}
 	return nil, errors.New("alias not found")
 }
+
+func SaveAll(entries []Entry) error {
+	if err := ensureDir(); err != nil {
+		return err
+	}
+
+	data, err := json.MarshalIndent(entries, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(vaultPath, Encrypt(data), 0600)
+}
