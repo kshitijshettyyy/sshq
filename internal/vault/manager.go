@@ -16,65 +16,66 @@ type Entry struct {
 	PEMFile  string `json:"pem_file,omitempty"`
 }
 
-var vaultPath = filepath.Join(os.Getenv("HOME"), ".sshq", "config.json")
+var vaultFile = filepath.Join(os.Getenv("HOME"), ".sshq_vault.json")
 
-func ensureDir() error {
-	return os.MkdirAll(filepath.Dir(vaultPath), 0700)
-}
+// LoadAll reads file and returns all entries as a map
+func LoadAll() (map[string]Entry, error) {
+	data := make(map[string]Entry)
 
-func Save(e Entry) error {
-	if err := ensureDir(); err != nil {
-		return err
-	}
-
-	all, _ := List()
-	all = append(all, e)
-	data, err := json.MarshalIndent(all, "", "  ")
+	file, err := os.ReadFile(vaultFile)
 	if err != nil {
-		return err
-	}
-	return os.WriteFile(vaultPath, Encrypt(data), 0600)
-}
-
-func List() ([]Entry, error) {
-	content, err := os.ReadFile(vaultPath)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return []Entry{}, nil
-		}
-		return nil, err
+		// Return empty map if file doesn't exist
+		return data, nil
 	}
 
-	decrypted := Decrypt(content)
-	var entries []Entry
-	if err := json.Unmarshal(decrypted, &entries); err != nil {
-		return nil, err
+	if len(file) == 0 {
+		return data, nil
 	}
-	return entries, nil
-}
 
-func Load(alias string) (*Entry, error) {
-	entries, err := List()
+	err = json.Unmarshal(file, &data)
 	if err != nil {
 		return nil, err
 	}
-	for _, e := range entries {
-		if e.Alias == alias {
-			return &e, nil
-		}
-	}
-	return nil, errors.New("alias not found")
+
+	return data, nil
 }
 
-func SaveAll(entries []Entry) error {
-	if err := ensureDir(); err != nil {
-		return err
-	}
-
-	data, err := json.MarshalIndent(entries, "", "  ")
+// SaveAll writes back full map to file
+func SaveAll(data map[string]Entry) error {
+	b, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return err
 	}
 
-	return os.WriteFile(vaultPath, Encrypt(data), 0600)
+	return os.WriteFile(vaultFile, b, 0600)
+}
+
+// Load loads a single entry by alias
+func Load(alias string) (Entry, error) {
+	entries, err := LoadAll()
+	if err != nil {
+		return Entry{}, err
+	}
+
+	entry, exists := entries[alias]
+	if !exists {
+		return Entry{}, errors.New("alias not found")
+	}
+
+	return entry, nil
+}
+
+// Save inserts/updates a single entry
+func Save(entry Entry) error {
+	entries, err := LoadAll()
+	if err != nil {
+		entries = make(map[string]Entry)
+	}
+	// 👇 FIX: map is always initialized
+	if entries == nil {
+		entries = make(map[string]Entry)
+	}
+
+	entries[entry.Alias] = entry
+	return SaveAll(entries)
 }

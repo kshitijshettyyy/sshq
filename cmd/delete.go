@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
 	"sshq/internal/vault"
-
 	"github.com/spf13/cobra"
 )
 
@@ -16,12 +14,11 @@ var deleteCmd = &cobra.Command{
 	Short: "Delete a saved SSH connection from the vault",
 	Run: func(cmd *cobra.Command, args []string) {
 		reader := bufio.NewReader(os.Stdin)
-
 		fmt.Print("Enter alias name to delete: ")
 		alias, _ := reader.ReadString('\n')
 		alias = strings.TrimSpace(alias)
 
-		entries, err := vault.List()
+		entries, err := vault.LoadAll()
 		if err != nil {
 			fmt.Println("❌ Failed to load vault:", err)
 			return
@@ -32,32 +29,21 @@ var deleteCmd = &cobra.Command{
 			return
 		}
 
-		found := false
-		var updated []vault.Entry
-
-		for _, e := range entries {
-			if e.Alias == alias {
-				found = true
-				fmt.Printf("🗑️  Found and deleted '%s'\n", alias)
-				continue
-			}
-			updated = append(updated, e)
-		}
-
-		if !found {
+		if _, found := entries[alias]; !found {
 			fmt.Println("❌ Alias not found in vault.")
 			return
 		}
 
-		if err := vault.SaveAll(updated); err != nil {
+		delete(entries, alias)
+
+		if err := vault.SaveAll(entries); err != nil {
 			fmt.Println("❌ Failed to update vault:", err)
 			return
 		}
 
+		fmt.Printf("🗑️  Found and deleted '%s'\n", alias)
 		fmt.Println("✅ Deleted successfully!")
 	},
 }
 
-func init() {
-	rootCmd.AddCommand(deleteCmd)
-}
+func init() { rootCmd.AddCommand(deleteCmd) }

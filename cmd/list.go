@@ -11,14 +11,18 @@ var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List saved SSH connections",
 	Run: func(cmd *cobra.Command, args []string) {
-		entries, err := vault.List()
+		entries, err := vault.LoadAll()
 		if err != nil {
-			fmt.Println("❌", err)
+			fmt.Println("❌ Failed to load vault:", err)
+			return
+		}
+		if len(entries) == 0 {
+			fmt.Println("No saved connections found.")
 			return
 		}
 		fmt.Println("🗂  Saved Connections:")
-		for _, e := range entries {
-			fmt.Printf("• %s (%s@%s, %s)\n", e.Alias, e.User, e.Host, e.Method)
+		for alias, e := range entries {
+			fmt.Printf("• %s (%s@%s, %s)\n", alias, e.User, e.Host, e.Method)
 		}
 	},
 }
