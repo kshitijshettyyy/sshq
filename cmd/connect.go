@@ -20,8 +20,8 @@ var connectCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("🔗 Connecting to %s@%s...\n", entry.User, entry.Host)
-		if err := ssh.Connect(entry); err != nil {
+		fmt.Printf("Connecting to %s@%s...\n(type exit to quit session)\n", entry.User, entry.Host)
+		if err := ssh.ConnectToServer(entry.User, entry.Host, entry.Password, entry.PEMFile); err != nil {
 			fmt.Println("❌ Connection failed:", err)
 		}
 	},
